@@ -50,15 +50,12 @@ function CpuStats({ cpus }) {
 }
 
 function MemStats({ mem_used, mem_total }) {
-    let mem_used_mb = (mem_used / 1_000_000).toFixed(2);
     let mem_total_mb = (mem_total / 1_000_000).toFixed(2);
     let mem_percent = (mem_used / mem_total * 100).toFixed(2);
-    let mem_free = ((mem_total_mb - mem_used_mb)).toFixed(0);
     return html`
         <div class="mem-bar">
-            <label>Total: ${mem_total_mb}MB</label>
-            <label>Used: ${mem_used_mb}MB</label>
-            <label>Free: ${mem_free}MB</label>
+            <label>Total: ${mem_total_mb} MB</label>
+            <label>Used: ${mem_percent} %</label>
             <div
                 class="mem-bar-inner"
                 style='
