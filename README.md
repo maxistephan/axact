@@ -5,6 +5,8 @@ some other remote host. Built with Rust & Preact, see the video:
 
 https://youtu.be/c_5Jy_AVDaM
 
+![example-screenshot.png](./assets/example-screenshot.png)
+
 ## Community forks
 
   - Using yeap instead of preact and tower backend: <https://github.com/hanako-eo/axact>
