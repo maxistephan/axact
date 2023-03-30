@@ -1,7 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
-
 * {
-  font-family: "Roboto", sans-serif;
+  font-family: ui-rounded;
 }
 
 body {
@@ -13,6 +11,17 @@ body {
 .light-mode {
   background: #F5F5F5;
   color: #222222;
+}
+
+.title {
+  text-align: center;
+  font-family: system-ui;
+  font-size: 40px;
+}
+
+.info-text {
+  color: #A3A3A3;
+  text-align: center;
 }
 
 .full-bar label {

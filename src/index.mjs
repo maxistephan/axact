@@ -75,10 +75,10 @@ function MemStats({ mem_used, mem_total }) {
 }
 
 if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-    console.log("INFO: Using light mode, since system theme preferrs light.");
+    console.log("INFO: Using light mode, since system theme prefers light.");
     document.body.classList.add("light-mode");
 } else {
-    console.log("INFO: Using dark mode, since system theme preferrs dark.");
+    console.log("INFO: Using dark mode, since system theme prefers dark.");
 }
 
 let url = new URL("/realtime/ressources", window.location.href);
