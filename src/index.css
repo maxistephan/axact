@@ -15,6 +15,28 @@ body {
   color: #222222;
 }
 
+.full-bar label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 1em;
+}
+
+.full-mem-bar {
+  width: 100%;
+}
+
+.full-mem-bar .mem-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 1em;
+}
+
+.full-mem-bar .mem-label label {
+  padding-inline: 0.5em;
+}
+
 .procs {
   display: flex;
   flex-flow: row wrap;

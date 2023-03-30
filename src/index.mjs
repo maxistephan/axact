@@ -36,12 +36,13 @@ function CpuStats({ cpus }) {
         return html`
           <div class="procs">
             ${cpus
-              .map((cpu, i) => ({ cpu, i }))
-              .sort((a, b) => (a.cpu < b.cpu ? 1 : -1))
-              .map(({ cpu, i }) => {
-                return html`<div class="bar">
-                  <${Proc} cpu=${cpu} total=${cpus.length} />
-                  <label>${i}</label>
+              .map((cpu, i) => {
+                return html`<div class="full-bar">
+                    <div class="bar">
+                        <${Proc} cpu=${cpu} total=${cpus.length} />
+                        <label>${cpu.toFixed(2)}%</label>
+                    </div>
+                    <label>${i}</label>
                 </div>`;
               })}
           </div>
@@ -50,22 +51,27 @@ function CpuStats({ cpus }) {
 }
 
 function MemStats({ mem_used, mem_total }) {
+    let mem_used_mb = (mem_used / 1_000_000).toFixed(2);
     let mem_total_mb = (mem_total / 1_000_000).toFixed(2);
+    let mem_free_mb = (mem_total_mb - mem_used_mb).toFixed(2);
     let mem_percent = (mem_used / mem_total * 100).toFixed(2);
-    return html`
+    return html`<div class="full-mem-bar">
         <div class="mem-bar">
-            <label>Total: ${mem_total_mb} MB</label>
-            <label>Used: ${mem_percent} %</label>
+            <label>${mem_percent}%</label>
             <div
                 class="mem-bar-inner"
                 style='
                     width: ${mem_percent}%;
                     opacity: ${mem_percent};
-                    background: ${percentageToColor(m(mem_percent))}
+                    background: ${percentageToColor(m(mem_percent))};
                 '
             ></div>
         </div>
-    `;
+        <div class="mem-label">
+            <label>Total: ${mem_total_mb} MB</label>
+            <label>Free: ${mem_free_mb} MB</label>
+        </div>
+    </div>`;
 }
 
 if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
