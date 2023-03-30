@@ -6,21 +6,50 @@
 
 body {
   background: #0f0f0f;
+  color: #F5F5F5;
+  margin: 0;
+}
+
+/* .light-mode {
+    background-color: #F5F5F5;
+    color: #222222;
+} */
+
+.procs {
+  display: flex;
+  flex-flow: row wrap;
+  max-width: 100vw;
+  max-height: 100vh;
+  gap: 1em;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 1.5em;
+}
+
+.main {
+    padding: 1em;
+}
+
+.main h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .bar {
   background: #264653;
   color: white;
 
-  width: 20em;
-  height: 2em;
-  margin: .5em;
-
   display: flex;
   align-items: center;
   justify-content: center;
 
   position: relative;
+  width: 6em;
+  height: 10em;
+  padding: 0;
 }
 
 .bar label {
@@ -28,9 +57,9 @@ body {
 }
 
 .bar .bar-inner {
-	z-index: 5;
+  z-index: 5;
 
-  height: 100%;
+  width: 100%;
 
   background: #2A9D8F;
   position: absolute;
@@ -38,9 +67,61 @@ body {
   top: 0;
   bottom: 0;
 
-	transition: width 0.2s;
+  transition: height .5s;
 }
 
-.bar, .bar-inner {
-  border-radius: 4px;
+.bar, .bar-inner, .mem-bar, .mem-bar-inner {
+  border-radius: 10px;
+}
+
+#mem_stats {
+    display: flex;
+    max-width: 100vw;
+    max-height: 100vh;
+
+    align-items: center;
+    justify-content: center;
+
+    /*2em instead of 1em padding, because CPUs use a 1em gap*/
+    padding: 2em;
+}
+
+.mem-bar {
+    background: #264653;
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+    width: 100%;
+    height: 6em;
+    padding: 0;
+}
+
+.mem-bar .mem-bar-inner {
+    z-index: 5;
+
+    height: 100%;
+
+    background: #2A9D8F;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    transition: width .5s;
+}
+
+.mem-bar .mem-bar-inner label {
+    z-index: 10;
+}
+
+.mem-bar label {
+	z-index: 10;
+    display: flex;
+    flex-flow: row wrap;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
 }
