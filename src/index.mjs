@@ -82,17 +82,44 @@ function MemStats({ mem_used, mem_total }) {
     </div>`;
 }
 
-let url = new URL("/realtime/ressources", window.location.href);
-// http => ws
-// https => wss
-url.protocol = url.protocol.replace("http", "ws");
-
-let ws = new WebSocket(url.href);
-ws.onmessage = (ev) => {
-    const json = JSON.parse(ev.data);
-    const cpus = json.cpus.Vec32;
-    const mem_used = json.mem_used.U64;
-    const mem_total = json.mem_total.U64;
+function handle_cpus(cpus_json) {
+    const cpus = cpus_json.Vec32;
     render(html`<${CpuStats} cpus=${cpus}></${CpuStats}>`, document.getElementById("cpu_stats"));
+}
+
+function handle_mem(mem_json) {
+    const mem_used = mem_json.HashMapU64.mem_used;
+    const mem_total = mem_json.HashMapU64.mem_total;
     render(html`<${MemStats} mem_used=${mem_used} mem_total=${mem_total}></${MemStats}>`, document.getElementById("mem_stats"));
 }
+
+const ENDPOINTS = [
+    "cpus",
+    "mem"
+]
+
+ENDPOINTS.forEach((endpoint) => {
+    let url = new URL("/realtime/" + endpoint, window.location.href);
+    // http => ws
+    // https => wss
+    url.protocol = url.protocol.replace("http", "ws");
+
+    let callback_func;
+    switch (endpoint) {
+        case "cpus":
+            callback_func = handle_cpus;
+            break;
+        case "mem":
+            callback_func = handle_mem;
+            break;
+        default:
+            console.log("Unknown Endpoint: /realtime/" + endpoint)
+            return;
+    }
+
+    let ws = new WebSocket(url.href);
+    ws.onmessage = (ev) => {
+        const json = JSON.parse(ev.data);
+        callback_func(json);
+    }
+});
