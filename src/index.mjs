@@ -83,19 +83,25 @@ function MemStats({ mem_used, mem_total }) {
 }
 
 function handle_cpus(cpus_json) {
-    const cpus = cpus_json.Vec32;
-    render(html`<${CpuStats} cpus=${cpus}></${CpuStats}>`, document.getElementById("cpu_stats"));
+    const cpus = cpus_json.CPUData;
+    render(
+        html`<${CpuStats} cpus=${cpus}></${CpuStats}>`,
+        document.getElementById("cpu_stats")
+    );
 }
 
 function handle_mem(mem_json) {
-    const mem_used = mem_json.HashMapU64.mem_used;
-    const mem_total = mem_json.HashMapU64.mem_total;
-    render(html`<${MemStats} mem_used=${mem_used} mem_total=${mem_total}></${MemStats}>`, document.getElementById("mem_stats"));
+    const mem_used = mem_json.MemData.mem_used;
+    const mem_total = mem_json.MemData.mem_total;
+    render(
+        html`<${MemStats} mem_used=${mem_used} mem_total=${mem_total}></${MemStats}>`,
+        document.getElementById("mem_stats")
+    );
 }
 
 const ENDPOINTS = [
     "cpus",
-    "mem"
+    "mem",
 ]
 
 ENDPOINTS.forEach((endpoint) => {

@@ -17,8 +17,8 @@ use serde::{Deserialize, Serialize};
 #[serde_as]
 #[derive(Clone, Serialize, Deserialize, Debug)]
 enum Snapshot {
-    HashMapU64(HashMap<String, u64>),
-    Vec32(Vec<f32>),
+    CPUData(Vec<f32>),
+    MemData(HashMap<String, u64>),
 }
 
 #[derive(Clone)]
@@ -36,7 +36,7 @@ async fn main() {
 
     let app_state = AppState { 
         cpu_tx: cpu_tx.clone(),
-        mem_tx: mem_tx.clone()
+        mem_tx: mem_tx.clone(),
     };
 
     let router = Router::new()
@@ -54,12 +54,13 @@ async fn main() {
             sys.refresh_all();
 
             let v: Vec<f32> = sys.cpus().iter().map(|cpu| cpu.cpu_usage()).collect();
-            let _ = cpu_tx.send(Snapshot::Vec32(v));
+            let _ = cpu_tx.send(Snapshot::CPUData(v));
 
             let mut map: HashMap<String, u64> = HashMap::new();
             map.insert("mem_used".to_string(), sys.used_memory());
             map.insert("mem_total".to_string(), sys.total_memory());
-            let _ = mem_tx.send(Snapshot::HashMapU64(map));
+            let _ = mem_tx.send(Snapshot::MemData(map));
+
             std::thread::sleep(System::MINIMUM_CPU_UPDATE_INTERVAL);
         }
     });
