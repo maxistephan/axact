@@ -3,6 +3,14 @@ import htm from "https://unpkg.com/htm?module";
 
 const html = htm.bind(h);
 
+// Light mode
+if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+    console.log("INFO: Using light mode, since system theme prefers light.");
+    document.body.classList.add("light-mode");
+} else {
+    console.log("INFO: Using dark mode, since system theme prefers dark.");
+}
+
 function percentageToColor(percentage, maxHue = 0, minHue = 120) {
     const hue = 120 - percentage;
     return `hsl(${hue}, 100%, 50%)`;
@@ -51,10 +59,10 @@ function CpuStats({ cpus }) {
 }
 
 function MemStats({ mem_used, mem_total }) {
-    let mem_used_mb = (mem_used / 1_000_000).toFixed(2);
-    let mem_total_mb = (mem_total / 1_000_000).toFixed(2);
-    let mem_free_mb = (mem_total_mb - mem_used_mb).toFixed(2);
-    let mem_percent = (mem_used / mem_total * 100).toFixed(2);
+    const mem_used_mb = (mem_used / 1_000_000).toFixed(2);
+    const mem_total_mb = (mem_total / 1_000_000).toFixed(2);
+    const mem_free_mb = (mem_total_mb - mem_used_mb).toFixed(2);
+    const mem_percent = (mem_used / mem_total * 100).toFixed(2);
     return html`<div class="full-mem-bar">
         <div class="mem-bar">
             <label>${mem_percent}%</label>
@@ -74,13 +82,6 @@ function MemStats({ mem_used, mem_total }) {
     </div>`;
 }
 
-if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-    console.log("INFO: Using light mode, since system theme prefers light.");
-    document.body.classList.add("light-mode");
-} else {
-    console.log("INFO: Using dark mode, since system theme prefers dark.");
-}
-
 let url = new URL("/realtime/ressources", window.location.href);
 // http => ws
 // https => wss
@@ -88,10 +89,10 @@ url.protocol = url.protocol.replace("http", "ws");
 
 let ws = new WebSocket(url.href);
 ws.onmessage = (ev) => {
-    let json = JSON.parse(ev.data);
-    let cpus = json.cpus.Vec32;
-    let mem_used = json.mem_used.U64;
-    let mem_total = json.mem_total.U64;
+    const json = JSON.parse(ev.data);
+    const cpus = json.cpus.Vec32;
+    const mem_used = json.mem_used.U64;
+    const mem_total = json.mem_total.U64;
     render(html`<${CpuStats} cpus=${cpus}></${CpuStats}>`, document.getElementById("cpu_stats"));
     render(html`<${MemStats} mem_used=${mem_used} mem_total=${mem_total}></${MemStats}>`, document.getElementById("mem_stats"));
 }
