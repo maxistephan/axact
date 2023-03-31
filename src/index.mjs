@@ -62,7 +62,7 @@ function MemStats({ mem_used, mem_total }) {
                 class="mem-bar-inner"
                 style='
                     width: ${mem_percent}%;
-                    opacity: ${mem_percent};
+                    opacity: ${mem_percent / 100};
                     background: ${percentageToColor(m(mem_percent))};
                 '
             ></div>
