@@ -108,7 +108,6 @@ body {
   background: #2A9D8F;
   position: absolute;
   left: 0;
-  top: 0;
   bottom: 0;
 
   transition: height .5s;
@@ -158,12 +157,11 @@ body {
   transition: width .5s;
 }
 
-.mem-bar .mem-bar-inner label, .bar .bar-inner label {
+.mem-bar label, .bar label {
   z-index: 10;
 }
 
 .mem-bar label {
-	z-index: 10;
   display: flex;
   flex-flow: row wrap;
   padding-left: 0.5em;

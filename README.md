@@ -5,7 +5,7 @@ some other remote host. Built with Rust & Preact, see the video:
 
 https://youtu.be/c_5Jy_AVDaM
 
-![example-screenshot.png](./assets/example-screenshot.png)
+![example-screenrec.gif](./assets/example-screenrec.gif)
 
 ## Community forks
 
