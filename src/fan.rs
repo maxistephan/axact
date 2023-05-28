@@ -3,16 +3,16 @@ use std::process::Command;
 const LIQUIDCTL: &str = "/usr/bin/liquidctl";
 const DELTA_TEMP: f32 = 5f32;
 const DELTA_SPEED: i32 = 4;
-const TARGET_CORE_TEMP: f32 = 55f32;
-const TARGET_GPU_TEMP: u32 = 65;
+const TARGET_CORE_TEMP: f32 = 50f32;
+const TARGET_GPU_TEMP: f32 = 70f32;
 const MIN_FAN_PERCENTAGE: i32 = 20;
 const MAX_FAN_PERCENTAGE: i32 = 70;
 
-pub fn liquidctl_modify_fan_speed(cpu_temp: f32, gpu_temp: u32, last_speed: i32) -> i32 {
+pub fn liquidctl_modify_fan_speed(cpu_temp: f32, gpu_temp: f32, last_speed: i32) -> i32 {
     let mut new_speed: i32 = last_speed;
 
     // get the biggest delta
-    let gpu_delta: f32 = (gpu_temp / TARGET_GPU_TEMP) as f32;
+    let gpu_delta: f32 = gpu_temp / TARGET_GPU_TEMP;
     let cpu_delta: f32 = cpu_temp / TARGET_CORE_TEMP;
 
     let mut source_temp: f32 = cpu_temp;
