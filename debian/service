@@ -1,0 +1,12 @@
+[Unit]
+Description=Axact
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/axact
+Type=simple
+RestartSec=5
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -1,11 +1,17 @@
 # axact
 
 A resource monitor in your browser, so you can view the state of a VM or
-some other remote host. Built with Rust & Preact, see the video:
-
-https://youtu.be/c_5Jy_AVDaM
+some other remote host. Built with Rust & Preact
 
 ![example-screenrec.gif](./assets/example-screenrec.gif)
+
+Axact can also set a fan curve on your Linux machine using an NZXT smart device.
+For this to work, install the [liquidctl](https://github.com/liquidctl/liquidctl)
+python library system-wide.
+
+## Original Project
+
+https://youtu.be/c_5Jy_AVDaM
 
 ## Community forks
 

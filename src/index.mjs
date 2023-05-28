@@ -4,12 +4,12 @@ import htm from "https://unpkg.com/htm?module";
 const html = htm.bind(h);
 
 // Light mode
-if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-    console.log("INFO: Using light mode, since system theme prefers light.");
-    document.body.classList.add("light-mode");
-} else {
-    console.log("INFO: Using dark mode, since system theme prefers dark.");
-}
+// if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+//     console.log("INFO: Using light mode, since system theme prefers light.");
+//     document.body.classList.add("light-mode");
+// } else {
+//     console.log("INFO: Using dark mode, since system theme prefers dark.");
+// }
 
 function percentageToColor(percentage, maxHue = 0, minHue = 120) {
     const hue = 120 - percentage;
@@ -82,6 +82,26 @@ function MemStats({ mem_used, mem_total }) {
     </div>`;
 }
 
+function TempStats({ cpu_temp, gpu_temp, fan_speed }) {
+    return html`<div class="full-temp-bar">
+        <div class="temp-bar">
+            <label>${fan_speed}%</label>
+            <div
+                class="temp-bar-inner"
+                style='
+                    width: ${fan_speed}%;
+                    opacity: ${fan_speed / 100};
+                    background: ${percentageToColor(m(fan_speed))};
+                '
+            ></div>
+        </div>
+        <div class="temp-label">
+            <label>CPU: ${cpu_temp} °C</label>
+            <label>GPU: ${gpu_temp} °C</label>
+        </div>
+    </div>`;
+}
+
 function handle_cpus(cpus_json) {
     const cpus = cpus_json.CPUData;
     render(
@@ -99,33 +119,34 @@ function handle_mem(mem_json) {
     );
 }
 
-const ENDPOINTS = [
-    "cpus",
-    "mem",
-]
+function handle_temp(temp_json) {
+    console.log(temp_json);
+    const cpu_temp = temp_json.cpu_temp.Temperature;
+    const gpu_temp = temp_json.gpu_temp.Temperature;
+    const fan_speed = temp_json.fan_speed.FanSpeed;
+    render(
+        html`<${TempStats} cpu_temp=${cpu_temp} gpu_temp=${gpu_temp} fan_speed=${fan_speed}></${TempStats}>`,
+        document.getElementById("temp_stats")
+    );
+}
 
-ENDPOINTS.forEach((endpoint) => {
-    let url = new URL("/realtime/" + endpoint, window.location.href);
-    // http => ws
-    // https => wss
-    url.protocol = url.protocol.replace("http", "ws");
+let ressource_url = new URL("/realtime/ressources", window.location.href);
+let temp_url = new URL("/realtime/temperature", window.location.href);
+// http => ws
+// https => wss
+ressource_url.protocol = ressource_url.protocol.replace("http", "ws");
+temp_url.protocol = temp_url.protocol.replace("http", "ws");
 
-    let callback_func;
-    switch (endpoint) {
-        case "cpus":
-            callback_func = handle_cpus;
-            break;
-        case "mem":
-            callback_func = handle_mem;
-            break;
-        default:
-            console.log("Unknown Endpoint: /realtime/" + endpoint)
-            return;
-    }
+let ressource_ws = new WebSocket(ressource_url.href);
+let temp_ws = new WebSocket(temp_url.href);
 
-    let ws = new WebSocket(url.href);
-    ws.onmessage = (ev) => {
-        const json = JSON.parse(ev.data);
-        callback_func(json);
-    }
-});
+ressource_ws.onmessage = (ev) => {
+    const json = JSON.parse(ev.data);
+    handle_cpus(json.Ressource.cpu);
+    handle_mem(json.Ressource.mem);
+}
+
+temp_ws.onmessage = (ev) => {
+    const json = JSON.parse(ev.data);
+    handle_temp(json.Temperature);
+}

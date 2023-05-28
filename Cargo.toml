@@ -1,9 +1,25 @@
 [package]
 name = "axact"
-version = "0.1.0"
+version = "0.2.1"
 edition = "2021"
+description = "A resource monitor in your browser, in Rust."
+license = "Apache-2.0"
+authors = ["Amos Wenger", "Maximilian Stephan"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[package.metadata.deb]
+priority = "required"
+maintainer-scripts = "debian/"
+changelog = "debian/changelog"
+systemd-units = { enable = true }
+assets = [
+    ["target/release/axact", "/usr/bin/", "755"],
+    ["README.md", "/usr/share/doc/axact/Readme", "644"],
+    ["src/index.mjs", "/usr/share/axact/", "755"],
+    ["src/index.css", "/usr/share/axact/", "644"],
+    ["src/index.html", "/usr/share/axact/", "644"],
+]
 
 [dependencies]
 axum = { version = "0.6.9", features = ["macros", "ws"] }
@@ -13,3 +29,5 @@ serde_with = "2.3.1"
 sysinfo = "0.28.2"
 tokio = { version = "1.25.0", features = ["full"] }
 tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
+systemstat = "0.2.3"
+nvml-wrapper = "^0.7.0"

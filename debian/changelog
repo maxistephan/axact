@@ -1,0 +1,18 @@
+axact (0.2.1) bullseye; urgency=medium
+
+  * Refactor endpoints
+  * Add temperature and fan curve for NVIDIA GPUs and NZXT Smart devices
+
+ -- Maximilian Stephan <stephan.maxi@icloud.com>  So, 28 May 2023 20:59:54 +0200
+
+axact (0.2.0) bullseye; urgency=medium
+
+  * Add Memory endpoint
+
+ -- Maximilian Stephan <stephan.maxi@icloud.com>  Thu, 17 Mar 2023 20:11:42 +0100
+
+axact (0.1.0) bullseye; urgency=medium
+
+  * better readme
+
+ -- Amos Wenger <amoswenger@gmail.com>  Fri, 17 Mar 2023 13:59:25 +0100
