@@ -1,7 +1,6 @@
 # axact
 
-A resource monitor in your browser, so you can view the state of a VM or
-some other remote host. Built with Rust & Preact
+This is a fork of axact, a resource monitor in your browser.
 
 ![example-screenrec.gif](./assets/example-screenrec.gif)
 
@@ -9,8 +8,36 @@ Axact can also set a fan curve on your Linux machine using an NZXT smart device.
 For this to work, install the [liquidctl](https://github.com/liquidctl/liquidctl)
 python library system-wide.
 
+```bash
+sudo pip3 install liquidctl
+```
+
+The debian package can be built via `cargo deb`:
+
+```bash
+# Install cargo-deb
+cargo install cargo-deb
+
+# Build debian Package
+cargo deb
+```
+
+and installed via apt or dpkg:
+
+```bash
+# apt
+sudo apt install ./target/debian/axact_<version>_<arch>.deb
+
+# or dpkg
+sudo dpkg -i ./target/debian/axact_<version>_<arch>.deb
+```
+
+Enjoy the project!
+
 ## Original Project
 
+A resource monitor in your browser, so you can view the state of a VM or
+some other remote host. Built with Rust & Preact. See the video:
 https://youtu.be/c_5Jy_AVDaM
 
 ## Community forks

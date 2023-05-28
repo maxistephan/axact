@@ -1,4 +1,5 @@
 #[tokio::main]
 async fn main() {
-    axact::start_server().await;
+    let args = axact::argparser::get_arg_parser();
+    axact::router::start_server(args).await;
 }
