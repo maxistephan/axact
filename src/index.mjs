@@ -120,7 +120,6 @@ function handle_mem(mem_json) {
 }
 
 function handle_temp(temp_json) {
-    console.log(temp_json);
     const cpu_temp = temp_json.cpu_temp.Temperature;
     const gpu_temp = temp_json.gpu_temp.Temperature;
     const fan_speed = temp_json.fan_speed.FanSpeed;

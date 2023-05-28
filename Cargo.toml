@@ -19,6 +19,9 @@ assets = [
     ["src/index.mjs", "/usr/share/axact/", "755"],
     ["src/index.css", "/usr/share/axact/", "644"],
     ["src/index.html", "/usr/share/axact/", "644"],
+    ["src/images/apple-touch-icon.png", "/usr/share/axact/images", "644"],
+    ["src/images/favicon-32x32.png", "/usr/share/axact/images", "644"],
+    ["src/images/favicon.ico", "/usr/share/axact/images", "644"],
 ]
 
 [dependencies]
@@ -28,6 +31,7 @@ serde_json = "1.0.93"
 serde_with = "2.3.1"
 sysinfo = "0.28.2"
 tokio = { version = "1.25.0", features = ["full"] }
+tokio-util = { version = "0.7.7", features = ["full"] }
 tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
 systemstat = "0.2.3"
 nvml-wrapper = "^0.7.0"

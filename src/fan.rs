@@ -15,18 +15,18 @@ pub fn liquidctl_modify_fan_speed(cpu_temp: f32, gpu_temp: u32, last_speed: i32)
     let gpu_delta: f32 = (gpu_temp / TARGET_GPU_TEMP) as f32;
     let cpu_delta: f32 = cpu_temp / TARGET_CORE_TEMP;
 
-    let mut orig_temp: f32 = cpu_temp;
+    let mut source_temp: f32 = cpu_temp;
     let mut target_temp: f32 = TARGET_CORE_TEMP;
 
     if cpu_delta < gpu_delta {
-        orig_temp = gpu_temp as f32;
+        source_temp = gpu_temp as f32;
         target_temp = TARGET_GPU_TEMP as f32;
     }
 
     // Compute new fan speed based on CPU temp
-    if orig_temp > target_temp + DELTA_TEMP {
+    if source_temp > target_temp + DELTA_TEMP {
         new_speed = last_speed + DELTA_SPEED;
-    } else if orig_temp < target_temp - DELTA_TEMP {
+    } else if source_temp <= target_temp {
         new_speed = last_speed - DELTA_SPEED;
     }
 

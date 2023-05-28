@@ -1,17 +1,19 @@
 use axum::{
     extract::{
         ws::{Message, WebSocket},
-        State, WebSocketUpgrade,
+        State, WebSocketUpgrade, Path
     },
     routing::{get, Router},
-    http::Response,
+    http::{Response, StatusCode},
     response::{Html, IntoResponse},
+    body::StreamBody,
     Server,
 };
-use tokio::sync::broadcast;
+use tokio::{sync::broadcast, fs::File};
 use std::collections::HashMap;
 use systemstat::Platform;
 use sysinfo::{CpuExt, SystemExt};
+use tokio_util::io::ReaderStream;
 use crate::argparser::ArgParser;
 
 use super::{AppState, Snapshot, RessourceData, TempData, fan, gpu};
@@ -79,37 +81,28 @@ async fn realtime_temperature_stream(app_state: AppState, mut ws: WebSocket) {
     }
 }
 
-pub async fn start_server(args: ArgParser) {
-    let (ressource_tx, _) = broadcast::channel::<Snapshot>(1);
-    let (temperature_tx, _) = broadcast::channel::<Snapshot>(1);
-
-    tracing_subscriber::fmt::init();
-
-    let app_state = AppState {
-        ressource_tx: ressource_tx.clone(),
-        temperature_tx: temperature_tx.clone(),
+async fn image_get(Path(path): Path<String>) -> impl IntoResponse {
+    // `File` implements `AsyncRead`
+    let file: File = match tokio::fs::File::open(format!("/usr/share/axact/images/{path}")).await {
+        Ok(file) => file,
+        Err(err) => return Err((StatusCode::NOT_FOUND, format!("File not found: {err}"))),
     };
+    let f_suffix = match path.split('.').collect::<Vec<&str>>().last() {
+        Some(suffix) => suffix.to_owned(),
+        None => return Err((StatusCode::BAD_REQUEST, format!("{path} has no file suffix."))),
+    };
+    // convert the `AsyncRead` into a `Stream`
+    let stream: ReaderStream<File> = ReaderStream::new(file);
+    // convert the `Stream` into an `axum::body::HttpBody`
+    let body: StreamBody<ReaderStream<File>> = StreamBody::new(stream);
 
-    let router = Router::new()
-        .route("/", get(root_get))
-        .route("/index.mjs", get(indexmjs_get))
-        .route("/index.css", get(indexcss_get))
-        .route("/realtime/ressources", get(realtime_ressources_get))
-        .route("/realtime/temperature", get(realtime_temperature_get))
-        .with_state(app_state.clone());
-
-    tokio::task::spawn(
-        background_task(ressource_tx.clone(), temperature_tx.clone(), args.use_liquidctl)
-    );
-
-    let server = Server::bind(
-        &format!("{}:{}", args.host, args.port).as_str()
-        .parse()
-        .unwrap()
-    ).serve(router.into_make_service());
-    let addr = server.local_addr();
-    println!("Listening on http://{addr}");
-    server.await.unwrap();
+    match Response::builder()
+        .header("content-type", format!("image/{f_suffix}"))
+        .header("attachment", format!("filename=\"{path}\""))
+        .body(body) {
+            Ok(resp) => Ok(resp),
+            Err(err) => Err((StatusCode::INTERNAL_SERVER_ERROR, format!("Error building response: {err}")))
+    }
 }
 
 async fn background_task(
@@ -168,7 +161,45 @@ async fn background_task(
                 let _ = temperature_tx.send(Snapshot::Temperature(temp_map));
             }
         }
-        // Wait a second for next check
-        std::thread::sleep(std::time::Duration::from_secs(1));
+        // Sleep 1s if using liquidctl; Sleep MINIMUM_CPU_UPDATE_INTERVAL if not
+        std::thread::sleep(if use_fan_curve {
+            std::time::Duration::from_secs(1)
+        } else {
+            sysinfo::System::MINIMUM_CPU_UPDATE_INTERVAL
+        });
     }
+}
+
+pub async fn start_server(args: ArgParser) {
+    let (ressource_tx, _) = broadcast::channel::<Snapshot>(1);
+    let (temperature_tx, _) = broadcast::channel::<Snapshot>(1);
+
+    tracing_subscriber::fmt::init();
+
+    let app_state = AppState {
+        ressource_tx: ressource_tx.clone(),
+        temperature_tx: temperature_tx.clone(),
+    };
+
+    let router = Router::new()
+        .route("/", get(root_get))
+        .route("/index.mjs", get(indexmjs_get))
+        .route("/index.css", get(indexcss_get))
+        .route("/realtime/ressources", get(realtime_ressources_get))
+        .route("/realtime/temperature", get(realtime_temperature_get))
+        .route("/images/*path", get(image_get))
+        .with_state(app_state.clone());
+
+    tokio::task::spawn(
+        background_task(ressource_tx.clone(), temperature_tx.clone(), args.use_liquidctl)
+    );
+
+    let server = Server::bind(
+        &format!("{}:{}", args.host, args.port).as_str()
+        .parse()
+        .unwrap()
+    ).serve(router.into_make_service());
+    let addr = server.local_addr();
+    println!("Listening on http://{addr}");
+    server.await.unwrap();
 }

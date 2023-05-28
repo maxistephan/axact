@@ -7,6 +7,9 @@ This is a fork of axact, a resource monitor in your browser.
 Axact can also set a fan curve on your Linux machine using an NZXT smart device.
 For this to work, install the [liquidctl](https://github.com/liquidctl/liquidctl)
 python library system-wide.
+If you are not planning on using liquidctl, remove the "--use-liquidctl" option
+in the service file at */lib/systemd/system/axact.service* (post installation)
+or *./debian/service* (before debian build).
 
 ```bash
 sudo pip3 install liquidctl
