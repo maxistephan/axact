@@ -15,17 +15,16 @@ pub fn get_gpu_avg_temp()  -> Result<f32, NvmlError> {
 }
 
 fn get_gpu_temps() -> Result<Vec<f32>, NvmlError> {
-    let nvml: NVML = NVML::init().unwrap();
-    let device_count: u32 = nvml.device_count().unwrap();
+    let nvml: NVML = NVML::init()?;
+    let device_count: u32 = nvml.device_count()?;
     let mut temperatures: Vec<f32> = vec![];
 
     for i in 0..device_count {
-        let device: Device = nvml.device_by_index(i).unwrap();
-        let temp: u32 = read_gpu_temp(&device).unwrap();
+        let device: Device = nvml.device_by_index(i)?;
+        let temp: u32 = read_gpu_temp(&device)?;
         temperatures.push(temp as f32);
     }
     Ok(temperatures)
-
 }
 
 fn read_gpu_temp(device: &Device) -> Result<u32, NvmlError> {

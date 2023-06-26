@@ -16,12 +16,12 @@ systemd-units = { enable = true }
 assets = [
     ["target/release/axact", "/usr/bin/", "755"],
     ["README.md", "/usr/share/doc/axact/Readme", "644"],
-    ["src/index.mjs", "/usr/share/axact/", "755"],
-    ["src/index.css", "/usr/share/axact/", "644"],
-    ["src/index.html", "/usr/share/axact/", "644"],
-    ["src/images/apple-touch-icon.png", "/usr/share/axact/images", "644"],
-    ["src/images/favicon-32x32.png", "/usr/share/axact/images", "644"],
-    ["src/images/favicon.ico", "/usr/share/axact/images", "644"],
+    ["src/assets/index.mjs", "/etc/axact/static/", "755"],
+    ["src/assets/index.css", "/etc/axact/static/", "644"],
+    ["src/assets/index.html", "/etc/axact/static/", "644"],
+    ["src/assets/images/apple-touch-icon.png", "/etc/axact/static/images", "644"],
+    ["src/assets/images/favicon-32x32.png", "/etc/axact/static/images", "644"],
+    ["src/assets/images/favicon.ico", "/etc/axact/static/images", "644"],
 ]
 
 [dependencies]

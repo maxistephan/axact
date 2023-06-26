@@ -4,7 +4,7 @@ use serde_with::serde_as;
 use serde::{Deserialize, Serialize};
 
 pub mod argparser;
-mod fan;
+// mod fan;
 mod gpu;
 pub mod router;
 
@@ -17,16 +17,9 @@ pub enum RessourceData {
 
 #[serde_as]
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub enum TempData {
-    Temperature(f32),
-    FanSpeed(i32),
-}
-
-#[serde_as]
-#[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum Snapshot {
     Ressource(HashMap<String, RessourceData>),
-    Temperature(HashMap<String, TempData>)
+    Temperature(HashMap<String, f32>)
 }
 
 #[derive(Clone)]

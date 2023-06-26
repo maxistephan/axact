@@ -16,18 +16,18 @@ use sysinfo::{CpuExt, SystemExt};
 use tokio_util::io::ReaderStream;
 use crate::argparser::ArgParser;
 
-use super::{AppState, Snapshot, RessourceData, TempData, fan, gpu};
+use super::{AppState, Snapshot, RessourceData, gpu};
 
 #[axum::debug_handler]
 async fn root_get() -> impl IntoResponse {
-    let markup = tokio::fs::read_to_string("/usr/share/axact/index.html").await.unwrap();
+    let markup = tokio::fs::read_to_string("/etc/axact/static/index.html").await.unwrap();
 
     Html(markup)
 }
 
 #[axum::debug_handler]
 async fn indexmjs_get() -> impl IntoResponse {
-    let markup = tokio::fs::read_to_string("/usr/share/axact/index.mjs").await.unwrap();
+    let markup = tokio::fs::read_to_string("/etc/axact/static/index.mjs").await.unwrap();
 
     Response::builder()
         .header("content-type", "application/javascript;charset=utf-8")
@@ -37,7 +37,7 @@ async fn indexmjs_get() -> impl IntoResponse {
 
 #[axum::debug_handler]
 async fn indexcss_get() -> impl IntoResponse {
-    let markup = tokio::fs::read_to_string("/usr/share/axact/index.css").await.unwrap();
+    let markup = tokio::fs::read_to_string("/etc/axact/static/index.css").await.unwrap();
 
     Response::builder()
         .header("content-type", "text/css;charset=utf-8")
@@ -83,7 +83,7 @@ async fn realtime_temperature_stream(app_state: AppState, mut ws: WebSocket) {
 
 async fn image_get(Path(path): Path<String>) -> impl IntoResponse {
     // `File` implements `AsyncRead`
-    let file: File = match tokio::fs::File::open(format!("/usr/share/axact/images/{path}")).await {
+    let file: File = match tokio::fs::File::open(format!("/etc/axact/static/images/{path}")).await {
         Ok(file) => file,
         Err(err) => return Err((StatusCode::NOT_FOUND, format!("File not found: {err}"))),
     };
@@ -108,20 +108,11 @@ async fn image_get(Path(path): Path<String>) -> impl IntoResponse {
 async fn background_task(
     ressource_tx: broadcast::Sender<Snapshot>,
     temperature_tx: broadcast::Sender<Snapshot>,
-    use_fan_curve: bool,
+    show_gpu_temp: bool,
 ) {
     let mut sys = sysinfo::System::new();
 
     let statsys = systemstat::System::new();
-    let mut last_speed: i32 = 20;
-
-    if use_fan_curve {
-        // initialize fan speed to MIN_FAN_PERCENTAGE
-        fan::initialize_liquidctl();
-        println!("Initializing fan speed to {}% ...", last_speed);
-        fan::run_liquidctl(last_speed);
-        println!();
-    }
 
     loop {
         sys.refresh_all();
@@ -138,35 +129,24 @@ async fn background_task(
         let _ = ressource_tx.send(Snapshot::Ressource(map));
 
         // Get the CPU Temp
-        let cpu_temp_ret = statsys.cpu_temp();
-        if let Err(err) = cpu_temp_ret {
-            println!("\nCPU temp: {}", err);
-        } else if let Ok(cpu_temp) = cpu_temp_ret {
-            // Adjust fan speed if necessary
-            let gpu_temp_ret = gpu::get_gpu_avg_temp();
-            if let Err(err) = gpu_temp_ret {
-                println!("\nGPU temp: {}", err);
-            } else if let Ok(gpu_temp) = gpu_temp_ret {
-                let mut temp_map: HashMap<String, TempData> = HashMap::new();
-                if use_fan_curve {
-                    last_speed = fan::liquidctl_modify_fan_speed(
-                        cpu_temp,
-                        gpu_temp,
-                        last_speed,
-                    );
+        match statsys.cpu_temp() {
+            Ok(cpu_temp) => {
+                let mut temp_map: HashMap<String, f32> = HashMap::new();
+                temp_map.insert("cpu_temp".to_string(), cpu_temp);
+                if show_gpu_temp {
+                    match gpu::get_gpu_avg_temp() {
+                        Ok(gpu_temp) => {
+                            temp_map.insert("gpu_temp".to_string(), gpu_temp as f32);
+                        },
+                        Err(err) => println!("\nGPU temp: {}", err)
+                    }
                 }
-                temp_map.insert("cpu_temp".to_string(), TempData::Temperature(cpu_temp));
-                temp_map.insert("gpu_temp".to_string(), TempData::Temperature(gpu_temp as f32));
-                temp_map.insert("fan_speed".to_string(), TempData::FanSpeed(last_speed));
                 let _ = temperature_tx.send(Snapshot::Temperature(temp_map));
-            }
+            },
+            Err(err) => println!("\nCPU temp: {}", err)
         }
-        // Sleep 1s if using liquidctl; Sleep MINIMUM_CPU_UPDATE_INTERVAL if not
-        std::thread::sleep(if use_fan_curve {
-            std::time::Duration::from_secs(1)
-        } else {
-            sysinfo::System::MINIMUM_CPU_UPDATE_INTERVAL
-        });
+        // Sleep MINIMUM_CPU_UPDATE_INTERVAL
+        std::thread::sleep(sysinfo::System::MINIMUM_CPU_UPDATE_INTERVAL);
     }
 }
 
@@ -191,7 +171,7 @@ pub async fn start_server(args: ArgParser) {
         .with_state(app_state.clone());
 
     tokio::task::spawn(
-        background_task(ressource_tx.clone(), temperature_tx.clone(), args.use_liquidctl)
+        background_task(ressource_tx.clone(), temperature_tx.clone(), args.show_gpu_temp)
     );
 
     let server = Server::bind(

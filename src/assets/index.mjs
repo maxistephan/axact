@@ -82,23 +82,35 @@ function MemStats({ mem_used, mem_total }) {
     </div>`;
 }
 
-function TempStats({ cpu_temp, gpu_temp, fan_speed }) {
+function GPU_TEMP({ gpu_temp }) {
+    return html`<div class="temp-bar">
+        <label>GPU: ${gpu_temp} °C</label>
+        <div
+            class="temp-bar-inner"
+            style='
+                width: ${gpu_temp}%;
+                opacity: ${gpu_temp / 100};
+                background: ${percentageToColor(m(gpu_temp))};
+            '
+        ></div>
+    </div>
+    `;
+}
+
+function TempStats({ cpu_temp, gpu_temp }) {
     return html`<div class="full-temp-bar">
         <div class="temp-bar">
-            <label>${fan_speed}%</label>
+            <label>CPU: ${cpu_temp} °C</label>
             <div
                 class="temp-bar-inner"
                 style='
-                    width: ${fan_speed}%;
-                    opacity: ${fan_speed / 100};
-                    background: ${percentageToColor(m(fan_speed))};
+                    width: ${cpu_temp}%;
+                    opacity: ${cpu_temp / 100};
+                    background: ${percentageToColor(m(cpu_temp))};
                 '
             ></div>
         </div>
-        <div class="temp-label">
-            <label>CPU: ${cpu_temp} °C</label>
-            <label>GPU: ${gpu_temp} °C</label>
-        </div>
+        ${gpu_temp ? html`<${GPU_TEMP} gpu_temp=${ gpu_temp } />` : ''}
     </div>`;
 }
 
@@ -120,11 +132,10 @@ function handle_mem(mem_json) {
 }
 
 function handle_temp(temp_json) {
-    const cpu_temp = temp_json.cpu_temp.Temperature;
-    const gpu_temp = temp_json.gpu_temp.Temperature;
-    const fan_speed = temp_json.fan_speed.FanSpeed;
+    const cpu_temp = temp_json.cpu_temp;
+    const gpu_temp = temp_json.gpu_temp ? temp_json.gpu_temp : null;
     render(
-        html`<${TempStats} cpu_temp=${cpu_temp} gpu_temp=${gpu_temp} fan_speed=${fan_speed}></${TempStats}>`,
+        html`<${TempStats} cpu_temp=${cpu_temp} gpu_temp=${gpu_temp}></${TempStats}>`,
         document.getElementById("temp_stats")
     );
 }

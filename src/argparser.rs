@@ -8,7 +8,7 @@ use clap::{
 pub struct ArgParser {
     pub host: String,
     pub port: String,
-    pub use_liquidctl: bool,
+    pub show_gpu_temp: bool,
 }
 
 pub fn get_arg_parser() -> ArgParser {
@@ -16,12 +16,11 @@ pub fn get_arg_parser() -> ArgParser {
         .version("0.2.1")
         .author("Maximilian Stephan")
         .about("A resource monitor in your browser, in Rust.")
-        .arg(Arg::new("use-liquidctl")
-            .short('l')
-            .long("use-liquidctl")
-            .default_value("false")
+        .arg(Arg::new("show-gpu-temp")
+            .long("show-gpu-temp")
             .action(ArgAction::SetTrue)
-            .help("Use liquidctl to setup a fan curve based off of you gpu and cpu temperature."))
+            .default_value("false")
+            .help("Show the GPU temperature aswell (works only for NVIDIA GPUs)."))
         .arg(Arg::new("host")
             .long("host")
             .default_value("0.0.0.0")
@@ -35,7 +34,7 @@ pub fn get_arg_parser() -> ArgParser {
 
     let host = matches.get_one::<String>("host").unwrap().to_owned();
     let port = matches.get_one::<String>("port").unwrap().to_owned();
-    let use_liquidctl: bool = *matches.get_one::<bool>("use-liquidctl").unwrap();
+    let show_gpu_temp: bool = *matches.get_one::<bool>("show-gpu-temp").unwrap();
 
-    ArgParser { host, port, use_liquidctl }
+    ArgParser { host, port, show_gpu_temp }
 }
