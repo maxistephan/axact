@@ -13,7 +13,7 @@ pub struct ArgParser {
 
 pub fn get_arg_parser() -> ArgParser {
     let matches: ArgMatches = Command::new("Axact")
-        .version("0.2.1")
+        .version("0.2.2")
         .author("Maximilian Stephan")
         .about("A resource monitor in your browser, in Rust.")
         .arg(Arg::new("show-gpu-temp")
