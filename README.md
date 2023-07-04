@@ -1,6 +1,9 @@
-# axact
+# `axact`
 
-This is a fork of axact, a resource monitor in your browser.
+> a resource monitor in your browser, in Rust
+
+This is a fork of [axact](https://github.com/fasterthanlime/axact) with memory and
+temperature info.
 
 ![example-screenrec.gif](./assets/example-screenrec.gif)
 
