@@ -3,7 +3,7 @@ Description=Axact
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/axact --use-liquidctl
+ExecStart=/usr/bin/axact --show-gpu-temp
 Type=simple
 RestartSec=5
 Restart=on-failure

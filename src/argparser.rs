@@ -20,7 +20,7 @@ pub fn get_arg_parser() -> ArgParser {
             .long("show-gpu-temp")
             .action(ArgAction::SetTrue)
             .default_value("false")
-            .help("Show the GPU temperature aswell (works only for NVIDIA GPUs)."))
+            .help("Show the GPU temperature as well (works only for NVIDIA GPUs)."))
         .arg(Arg::new("host")
             .long("host")
             .default_value("0.0.0.0")
