@@ -3,7 +3,7 @@ import htm from "https://unpkg.com/htm?module";
 
 const html = htm.bind(h);
 
-// Light mode
+// Light mode (deactivated for now)
 // if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
 //     console.log("INFO: Using light mode, since system theme prefers light.");
 //     document.body.classList.add("light-mode");
